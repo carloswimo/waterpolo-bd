@@ -1,3 +1,4 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -10,7 +11,7 @@ import java.sql.*;
 
 /**
  *
- * @author victor
+ * @author Carlos Díaz
  */
 public class Equipo {
 
@@ -75,7 +76,11 @@ public class Equipo {
 
     // ---------- CRUD BÁSICO
     public boolean create() {
-
+        // new objeto vacio
+        // relleno todos los datos menos el id
+        // invoco cuando quiera guardar
+        // relleno desde interfaz usuario
+        //insert
         return true;
     }
 
@@ -86,13 +91,23 @@ public class Equipo {
         setCiudad("Ciudad ejemplo");
         setPais("Pais ejemplo");
         return true;
+        
+        // tener un objeto tener el id, y que le resto de lso campos se rellenen
+        // es un select por id
+        // 
     }
 
     public boolean update() {
         return true;
+        // previamente tiene que haber un retrieve
+        // hay un objeto relleno
+        // se cambia lo que sea y se hace un update de todos los campos menos del id
     }
 
     public boolean delete() {
+        // creo un objeto
+        // relleno el id
+        // delete con lo que haya en el campod el id
         return true;
     }
 

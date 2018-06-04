@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package model;
 
 import java.util.*;
@@ -10,7 +6,7 @@ import java.sql.*;
 
 /**
  *
- * @author victor
+ * @author Carlos Díaz
  */
 public class Jugador {
 
@@ -49,6 +45,10 @@ public class Jugador {
         this.idEquipo = idEquipo;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public String getNombre() {
         return nombre;
     }
@@ -81,22 +81,75 @@ public class Jugador {
         this.idEquipo = idEquipo;
     }
 
+    
+    
     // --------- OPERACIONES BD ----------------------------------------
     // ---------- CRUD BÁSICO
     public boolean create() {
-        return true;
+        boolean todoOk = true;
+        try (Connection conn = ConexionBd.obtener()) {
+            try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO jugador (nombre, apellidos, edad, idequipo) VALUES (?, ?, ?, ?)")) {
+                stmt.setString(1, getNombre());
+                stmt.setString(2, getApellidos());
+                stmt.setInt(3, getEdad());
+                stmt.setInt(4, getIdEquipo());
+                stmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            todoOk = false;
+        }
+
+        return todoOk;
     }
 
     public boolean retrieve() {
-        return true;
+        boolean todoOk = true;
+        try (Connection conn = ConexionBd.obtener()) {
+            try (PreparedStatement stmt = conn.prepareStatement("SELECT nombre, apellidos, edad, idequipo FROM jugador WHERE id = ?")) {
+                stmt.setInt(1, getId());
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        setNombre(rs.getString("nombre"));
+                        setApellidos(rs.getString("apellidos"));
+                        setEdad(rs.getInt("edad"));
+                        setIdEquipo(rs.getInt("idequipo"));
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            todoOk = false;
+        }
+
+        return todoOk;
     }
 
     public boolean update() {
-        return true;
+        boolean todoOk = true;
+        try (Connection conn = ConexionBd.obtener()) {
+            try (PreparedStatement stmt = conn.prepareStatement("UPDATE jugador SET nombre = ?, apellidos = ?, idequipo = ? WHERE id = ?")) {
+                stmt.setString(1, getNombre());
+                stmt.setString(2, getApellidos());
+                stmt.setInt(3, getIdEquipo());
+                stmt.setInt(4, getId());
+                stmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            todoOk = false;
+        }
+        return todoOk;
     }
 
     public boolean delete() {
-        return true;
+        boolean todoOk = true;
+        try (Connection conn = ConexionBd.obtener()) {
+            try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM jugador WHERE id = ?")) {
+                stmt.setInt(1, getId());
+                stmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            todoOk = false;
+        }
+        return todoOk;
     }
 
     // ----------- Otras, de clase, no relacionadas con ÉSTE (this) objeto
@@ -106,8 +159,43 @@ public class Jugador {
         Master: 26 años o más. */
 
         List<Jugador> resultado = new ArrayList<>();
-        resultado.add(new Jugador("Paco", "López", 19));
-        resultado.add(new Jugador("Luisa", "Martínez", 21));
-        return resultado;
+        boolean todoOk = true;
+        try (Connection conn = ConexionBd.obtener()) {
+
+            String sql = "SELECT id, nombre, apellidos, edad, idequipo FROM jugador";
+            
+                sql = sql + " WHERE LOWER(nombre) LIKE ? OR LOWER(apellidos) LIKE ?";
+                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                    String busquedaSql = "%" + busqueda.toLowerCase() + "%";
+                    stmt.setString(1, busquedaSql);
+                    stmt.setString(2, busquedaSql);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        while (rs.next()) {
+                            if (esJunior && rs.getInt("edad") >= 14 && rs.getInt("edad") < 18) {
+                                resultado.add(new Jugador(rs.getInt("id"), rs.getString("nombre"),
+                                        rs.getString("apellidos"), rs.getInt("edad"), rs.getInt("idequipo")));
+                            } else if (esClass && rs.getInt("edad") >= 18 && rs.getInt("edad") < 26) {
+                                resultado.add(new Jugador(rs.getInt("id"), rs.getString("nombre"),
+                                        rs.getString("apellidos"), rs.getInt("edad"), rs.getInt("idequipo")));
+                            } else if (esMaster && rs.getInt("edad") > 26) {
+                                resultado.add(new Jugador(rs.getInt("id"), rs.getString("nombre"),
+                                        rs.getString("apellidos"), rs.getInt("edad"), rs.getInt("idequipo")));
+                            } else if (!(esJunior) && !(esClass) && !(esMaster)) {
+                                resultado.add(new Jugador(rs.getInt("id"), rs.getString("nombre"),
+                                        rs.getString("apellidos"), rs.getInt("edad"), rs.getInt("idequipo")));
+                            }
+                        }
+                    }
+                }
+        } catch (SQLException ex) {
+            todoOk = false;
+        }
+        if (todoOk) {
+            return resultado;
+        } else {
+            return null;
+        }
+        
+        
     }
 }
