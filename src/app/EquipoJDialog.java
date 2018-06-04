@@ -1,13 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package app;
 import model.*;
 /**
  *
- * @author victor
+ * @author Carlos Díaz
  */
 public class EquipoJDialog extends javax.swing.JDialog {
 
@@ -155,6 +151,9 @@ public class EquipoJDialog extends javax.swing.JDialog {
 
     private void jButtonGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGuardarActionPerformed
         boolean exito;
+        equipo.setNombre(jTextFieldNombre.getText());
+        equipo.setCiudad(jTextFieldCiudad.getText());
+        equipo.setPais(jTextFieldPais.getText());
         if (equipo.getId() < 1) {
            exito = equipo.create();
         } else {
@@ -162,6 +161,7 @@ public class EquipoJDialog extends javax.swing.JDialog {
         }
         this.accion = ACCION_GUARDAR;
         this.setVisible(false);
+        
     }//GEN-LAST:event_jButtonGuardarActionPerformed
 
     private void jButtonCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCerrarActionPerformed
